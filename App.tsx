@@ -1,15 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import { SchoolReport, Province } from './types';
-import { INITIAL_REPORTS, COLORS } from './constants';
+import { SchoolReport, Province, EvidenceDocument } from './types';
+import { INITIAL_REPORTS, COLORS, INITIAL_DOCUMENTS } from './constants';
 import Dashboard from './components/Dashboard';
 import ReportForm from './components/ReportForm';
+import DocumentGallery from './components/DocumentGallery';
 import { getAIInsights } from './services/geminiService';
 
 const App: React.FC = () => {
   const [reports, setReports] = useState<SchoolReport[]>(INITIAL_REPORTS);
+  const [documents, setDocuments] = useState<EvidenceDocument[]>(INITIAL_DOCUMENTS);
   const [isUrdu, setIsUrdu] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'report' | 'about'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'report' | 'gallery' | 'about'>('dashboard');
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -20,6 +22,15 @@ const App: React.FC = () => {
       timestamp: new Date().toISOString()
     };
     setReports([report, ...reports]);
+  };
+
+  const handleAddDocument = (newDoc: Omit<EvidenceDocument, 'id' | 'timestamp'>) => {
+    const doc: EvidenceDocument = {
+      ...newDoc,
+      id: Math.random().toString(36).substr(2, 9),
+      timestamp: new Date().toISOString()
+    };
+    setDocuments([doc, ...documents]);
   };
 
   const runAnalysis = async () => {
@@ -57,6 +68,12 @@ const App: React.FC = () => {
                 className={`px-3 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'report' ? 'border-[#0083ca] text-[#0083ca]' : 'border-transparent text-gray-500 hover:text-[#0083ca]'}`}
               >
                 {isUrdu ? 'رپورٹ کریں' : 'Report Issue'}
+              </button>
+              <button 
+                onClick={() => setActiveTab('gallery')}
+                className={`px-3 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'gallery' ? 'border-[#0083ca] text-[#0083ca]' : 'border-transparent text-gray-500 hover:text-[#0083ca]'}`}
+              >
+                {isUrdu ? 'گیلری' : 'Gallery'}
               </button>
               <button 
                 onClick={() => setActiveTab('about')}
@@ -213,6 +230,14 @@ const App: React.FC = () => {
           <div className="max-w-3xl mx-auto">
             <ReportForm onSubmit={handleAddReport} />
           </div>
+        )}
+
+        {activeTab === 'gallery' && (
+          <DocumentGallery 
+            documents={documents} 
+            onUpload={handleAddDocument} 
+            isUrdu={isUrdu}
+          />
         )}
 
         {activeTab === 'about' && (

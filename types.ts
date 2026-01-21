@@ -24,3 +24,14 @@ export interface Feedback {
   userType: string;
   timestamp: string;
 }
+
+export interface EvidenceDocument {
+  id: string;
+  title: string;
+  description: string;
+  fileType: 'image' | 'pdf' | 'doc';
+  url: string;
+  province: Province;
+  uploadedBy: string;
+  timestamp: string;
+}
